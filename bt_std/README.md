@@ -1,10 +1,10 @@
 ## Backtrace std::thread
 
-## 1. signal-slot try-catch
+## 1. Handled exception raised in std::thread
 
 The try-catch in the 'invokeSlot' function consumes all exceptions preventing program termination.
 
-## 2. No try-catch
+## 2. Unhandled exception raised in std::thread
 
 Remove the try-catch code in 'invokeSlot' and recompile. The program now aborts.
 
