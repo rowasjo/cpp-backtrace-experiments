@@ -68,7 +68,7 @@ void *QThreadPrivate::start(void *arg)
 ...
 ```
 
-## 2. Unhandled exception raised in QThread with noexcept
+## 2. Unhandled exception raised in QThread with noexcept (no destructors)
 
 Add noexcept specifier to the 'asyncSignalEvent' function and recompile. 
 The noexcept specifier takes precedence over the thread exception handler.
@@ -108,9 +108,10 @@ The coredump backtrace is:
 
 In this example, the backtrace shows the original bad optional acces throw location.
 
-However, backtrace may not necessarily show the origin throw location. Noexcept "may or may not unwind the stack", it is an implementation datail.
+## 3. Unhandled exception raised in QThread with noexcept (destructors)
 
-According to [cppreference.com](https://en.cppreference.com/w/cpp/language/noexcept_spec):
+Backtrace may not necessarily show the origin throw location. Noexcept may or may not unwind the stack, 
+it is an implementation detail [link](https://en.cppreference.com/w/cpp/language/noexcept_spec):
 ```
 noexcept is an improved version of throw(), which is deprecated in C++11. 
 Unlike pre-C++17 throw(), noexcept will not call std::unexpected, 
@@ -118,4 +119,38 @@ may or may not unwind the stack, and will call std::terminate,
 which potentially allows the compiler to implement noexcept without the runtime overhead of throw().
 ```
 
-Observed on gcc8 -- backtrace showing std::terminate called at the location of the noexcept specifier, thereby obscuring the origin throw location.
+Uncomment the local string variable in function 'f' and recompile.
+The noxcept combined with the local string variable alters the backtrace.
+
+The program output is:
+```
+terminate called after throwing an instance of 'std::bad_optional_access'
+  what():  bad optional access
+Aborted
+```
+
+The coredump backtrace is:
+```
+#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=139923066439232) at ./nptl/pthread_kill.c:44
+#1  __pthread_kill_internal (signo=6, threadid=139923066439232) at ./nptl/pthread_kill.c:78
+#2  __GI___pthread_kill (threadid=139923066439232, signo=signo@entry=6) at ./nptl/pthread_kill.c:89
+#3  0x00007f42630dd476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
+#4  0x00007f42630c37f3 in __GI_abort () at ./stdlib/abort.c:79
+#5  0x00007f4263386b9e in ?? () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#6  0x00007f426339220c in ?? () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#7  0x00007f42633911e9 in ?? () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#8  0x00007f4263391959 in __gxx_personality_v0 () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#9  0x00007f42632da884 in ?? () from /lib/x86_64-linux-gnu/libgcc_s.so.1
+#10 0x00007f42632db2dd in _Unwind_Resume () from /lib/x86_64-linux-gnu/libgcc_s.so.1
+#11 0x000055c8288ff562 in (anonymous namespace)::f () at /home/bob/dev/repos/cpp-backtrace-experiments/bt_qt/main.cpp:26
+#12 0x000055c8288ff57a in (anonymous namespace)::invokeSlot () at /home/bob/dev/repos/cpp-backtrace-experiments/bt_qt/main.cpp:29
+#13 0x000055c8288ff58a in (anonymous namespace)::asyncSignalEvent () at /home/bob/dev/repos/cpp-backtrace-experiments/bt_qt/main.cpp:33
+#14 0x000055c8288ff5a3 in (anonymous namespace)::WorkerThread::run (this=0x7fffee920bc0) at /home/bob/dev/repos/cpp-backtrace-experiments/bt_qt/main.cpp:38
+#15 0x00007f42637cdfcf in ?? () from /lib/x86_64-linux-gnu/libQt6Core.so.6
+#16 0x00007f426312fac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#17 0x00007f42631c1850 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+```
+
+In this example, the backtrace has been unwound to the function 'f' where the string destructor is called.
+
+The destructor interfering with backtrace combined with noexcept has previously been described here: https://gcc.gnu.org/legacy-ml/gcc-help/2013-01/msg00058.html
