@@ -24,5 +24,3 @@ find_package(Qt6 REQUIRED COMPONENTS Core)
 
 add_subdirectory(bt_std)
 add_subdirectory(bt_qt)
-add_subdirectory(bt_qt2_core)
-add_subdirectory(bt_qt2)

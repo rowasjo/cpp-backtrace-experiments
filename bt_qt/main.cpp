@@ -20,6 +20,7 @@ void bad() {
 }
 
 void f() {
+  //  std::string s = "f";
   good();
   bad();
 }
