@@ -1,3 +1,4 @@
 
 add_executable(bt_std
-    main.cpp)
+    main.cpp
+    README.md)

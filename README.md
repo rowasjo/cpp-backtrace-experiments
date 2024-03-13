@@ -9,22 +9,31 @@ Consume std::exception raised by slot invocation: bad optional access
 
 The error message does not include origin where it was raised. The exception could have been raised in many locations.
 
-## Core Dumps
+Not handling the exception allowing program to terminate with full backtrace of origin throw location may provide better diagnostics.
+
+## Core Dumps -- Ubuntu LTS 22.04 on WSL 2
 
 Check current core dump location:
 ```
 cat /proc/sys/kernel/core_pattern
 ```
 
-Expected result on Ubuntu LTS 22.04 on WSL 2 is '/mnt/wslg/dumps'.
+Expected result is '/mnt/wslg/dumps'.
 
 Enable coredumps:
 ```
 ulimit -c unlimited
 ```
 
-## bt_std
+## Testing
 
-1. try-catch obscures throw location, program running in potentially corrupt state
-2. remove try-catch. std::terminate called immediately at bad optional access throw origin location
-3. add back try-catch and add noexcept in f1. std::terminate called immediately at bad optional acces throw origin location
+Run:
+```
+<build_dir>/bt_std/bt_std
+```
+
+Load coredump and print backtrace:
+```
+gdb <build_dir>/bt_std/bt_std <coredump>
+bt
+```

@@ -22,13 +22,13 @@ void bad() {
   state.value();  // throws std::bad_optional_access
 }
 
-void f() /*noexcept*/ {
+void f() {
   good();
   bad();
 }
 
 void invokeSlot() {
-  // catching exception obscures throw location
+  // catching exception obscures origin throw location
   try {
     f();
   } catch (const std::exception& e) {
