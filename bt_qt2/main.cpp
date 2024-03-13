@@ -1,34 +1,17 @@
+#include <row/bt_qt2_core/core.hpp>
 #include <QThread>
-#include <iostream>
-#include <optional>
 #include <chrono>
 
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
 
 namespace {
-static std::optional<std::string_view> state = std::nullopt;
-
-void good() {
-  if (state) {
-    state.value();
-  }
-}
-
-void bad() {
-  state.value();  // throws std::bad_optional_access
-}
-
-void f() {
-  good();
-  bad();
-}
 
 void invokeSlot() {
-  f();
+  row::bt_qt2_core::f();
 }
 
-void asyncSignalEvent() /*noexcept*/ {
+void asyncSignalEvent() noexcept {
   invokeSlot();
 }
 

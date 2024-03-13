@@ -1,3 +1,3 @@
 
-add_executable(row_bt_std
+add_executable(bt_std
     main.cpp)

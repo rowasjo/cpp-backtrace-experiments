@@ -1,9 +1,8 @@
-# proto-talk-march-2024
-TBD
+# C++ Backtrace Experiments
 
 ## Scenario
 
-During stress test, unecpected exception is raised, exception is caught and error message is printed:
+During stress test, unexpected exception is raised, exception is caught and error message is printed:
 ```
 Consume std::exception raised by slot invocation: bad optional access
 ```
@@ -23,7 +22,6 @@ Enable coredumps:
 ```
 ulimit -c unlimited
 ```
-
 
 ## bt_std
 

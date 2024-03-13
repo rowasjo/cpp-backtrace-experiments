@@ -1,5 +1,5 @@
 
-add_executable(row_bt_qt
+add_executable(bt_qt
     main.cpp)
 
-target_link_libraries(row_bt_qt PRIVATE Qt6::Core)
+target_link_libraries(bt_qt PRIVATE Qt6::Core)
